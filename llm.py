@@ -2,9 +2,9 @@
 
 import os
 from langchain import PromptTemplate, HuggingFaceHub, LLMChain
-os.environ['HUGGINGFACEHUB_API_TOKEN'] = "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"
+token = os.getenv('HUGGINGFACEHUB_API_TOKEN')
 
-google_key = "AIzaSyAfxI7deHMJOzoYZbjWE-KiZ-Jgkdmii-0"
+google_key = None
 
 template = """Two words are going to fight. Which of the following words wins?
 
