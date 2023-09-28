@@ -46,9 +46,9 @@ def initialize_game():
     stage = 1
     word_number = 1
     current_level = 1
-    ink = 1111110
+    ink = 0
     redraw = False
-    summon_letter = True
+    summon_letter = False
     skip_word = False
     increase_hp = False
     increase_hand_size = False
@@ -537,7 +537,7 @@ def game():
                                        word_number=word_number,
                                        )
             else:
-                letter_requested = request.form.get('letter_to_summon')
+                letter_requested = request.form.get('letter_to_summon').lower()
                 if letter_requested not in alphabet:
                     error_message = "Error: Must select letter of English alphabet."
                     return render_template('game.html',
