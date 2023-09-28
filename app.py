@@ -197,13 +197,6 @@ def game():
                                        word_number=word_number,
                                        )
 
-            # if it passes checks
-            # remove the letters from hand
-            for letter in player_word_list:
-                hand.remove(letter)
-
-            word_number += 1
-
             # run the llm to see who wins
             llm_response = get_winner(player_word, npc_word)
             print(f"TEST: This is players word: {player_word}")
@@ -297,6 +290,12 @@ def game():
                                        word_number=word_number,
                                        )
 
+            # if it passes checks
+            # remove the letters from hand
+            for letter in player_word_list:
+                hand.remove(letter)
+
+            word_number += 1
 
 
             # if stage is over 9 or something, go to rewards screen
