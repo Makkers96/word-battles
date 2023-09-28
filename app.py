@@ -205,7 +205,7 @@ def game():
             word_number += 1
 
             # run the llm to see who wins
-            llm_response = get_winner(player_word=player_word, npc_word=npc_word)
+            llm_response = get_winner(player_word, npc_word)
             print(f"TEST: This is players word: {player_word}")
             print(f"TEST: This is npc word: {npc_word}")
             print(f"TEST: This is llm response (winner): {llm_response}")
@@ -225,12 +225,12 @@ def game():
                 #increase stage
                 stage += 1
 
-            # check if player is dead
-            if hp <= 0:
-                return redirect(url_for("game-over"))
+                # check if player is dead
+                if hp <= 0:
+                    return redirect(url_for("game-over"))
 
             # if player word wins
-            if llm_response == player_word:
+            elif llm_response == player_word:
 
                 # add correct amount of ink
                 if stage < 10:
@@ -271,6 +271,32 @@ def game():
                     heal = lifesteal_check()
                     hp += heal
                     ability_message = f"Lifesteal healed for {heal} hp."
+
+            else:
+                error_message = f"ERROR: Please report. LLM returned {llm_response} instead of the winning word. Please proceed with a different word."
+                print(f"ERROR: llm_response not player_word or npc_word. llm_response: {llm_response}")
+                return render_template('game.html',
+                                       error_message=error_message,
+                                       npc_word=npc_word,
+                                       hand=hand,
+                                       hp=hp,
+                                       player_word_history=player_word_history,
+                                       npc_word_history=npc_word_history,
+                                       llm_response_history=llm_response_history,
+                                       player_damage_history=player_damage_history,
+                                       current_level=current_level,
+                                       redraw=redraw,
+                                       summon_letter=summon_letter,
+                                       skip_word=skip_word,
+                                       increase_hp=increase_hp,
+                                       increase_hand_size=increase_hand_size,
+                                       lifesteal=lifesteal,
+                                       ability_message=ability_message,
+                                       ink=ink,
+                                       ink_history=ink_history,
+                                       word_number=word_number,
+                                       )
+
 
 
             # if stage is over 9 or something, go to rewards screen
