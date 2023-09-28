@@ -43,6 +43,16 @@ def initialize_game():
     global npc_word_history
     global llm_response_history
     global player_damage_history
+    global lvl1_words
+    global lvl2_words
+    global lvl3_words
+    global lvl4_words
+    global lvl5_words
+    global lvl6_words
+    global lvl7_words
+    global lvl8_words
+    global lvl9_words
+    global lvl10_words
     stage = 1
     word_number = 1
     current_level = 1
@@ -61,6 +71,26 @@ def initialize_game():
     npc_word_history = None
     llm_response_history = None
     player_damage_history = None
+    lvl1_words = ['bat', 'book', 'rock', 'claws', 'scissors', 'cat', 'dog', 'wrestler', 'ice', 'melancholy',
+                  'psychology', 'keeper']
+    lvl2_words = ['robot', 'unicorn', 'mystery', 'bee', 'knife', 'fire', 'earth', 'light', 'thunder', 'science', 'elf',
+                  'mermaid']
+    lvl3_words = ['wizard', 'pirate', 'nina', 'samurai', 'vampire', 'werewolf', 'zombie', 'ghost', 'troll', 'witch',
+                  'knight', 'cyclops', 'yeti', 'minotaur']
+    lvl4_words = ['valkyrie', 'happy', 'believe', 'harmony', 'freedom', 'america', 'eagle', 'energy', 'imagination',
+                  'dream', 'truth', 'beauty']
+    lvl5_words = ['chaos', 'mystery', 'time', 'hope', 'knowledge', 'fate', 'courage', 'fear', 'justice', 'nightmare',
+                  'villian', 'sickness']
+    lvl6_words = ['mafia', 'magic', 'insane', 'maniac', 'murderer', 'faith', 'truth', 'beauty', 'joy', 'grace', 'hope',
+                  'harmony']
+    lvl7_words = ['indomitable', 'thunderbolt', 'explosion', 'earthquake', 'avalanche', 'justice', 'freedom', 'wisdom',
+                  'eternal', 'transcendent', 'pinnacle', 'valkyrie']
+    lvl8_words = ['goliath', 'hercules', 'colossus', 'juggernaut', 'warlord', 'inferno', 'behemoth', 'leviathan',
+                  'tsunami', 'kraken', 'gladiator']
+    lvl9_words = ['invincible', 'love', 'eternity', 'supreme', 'apex', 'wisdom', 'cataclysm', 'supernova', 'phoenix',
+                  'miracle', 'destiny', 'dominant']
+    lvl10_words = ['apocalypse', 'dragon', 'titan', 'warlord', 'omnipotence', 'omniscience', 'perfection', 'champion',
+                   'infinity', 'unbeatable', 'undefeated', 'death']
 
     # draw the correct amount of letters for the player, add to list called hand
     global hand
@@ -220,7 +250,7 @@ def game():
 
                 # check if player is dead
                 if hp <= 0:
-                    return redirect(url_for("game-over"))
+                    return redirect(url_for("game_over"))
 
             # if player word wins
             elif llm_response == player_word:

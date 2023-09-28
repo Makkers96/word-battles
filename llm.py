@@ -49,7 +49,7 @@ model = models[0].name
 
 
 def get_winner(player_word, npc_word):
-    prompt = f"""Two words are going to fight. Which of the following words wins? If you are unsure about which word would win, use your best reasoning to pick one of them. Always respond with one of the words.
+    prompt = f"""Two words are going to fight. Which of the following words wins? If you are unsure about which word would win, or think neither would win, use your best reasoning to pick one of them. Always, no matter what, respond with one of the words.
 
     {player_word} VS {npc_word}
 
