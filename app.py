@@ -19,6 +19,12 @@ lifesteal = False
 
 @app.route("/")
 def homepage():
+    return render_template('homepage.html')
+
+
+@app.route("/initialize-game", methods=["POST"])
+def initialize_game():
+    # reset all of the game variables
     global stage
     global word_number
     global current_level
@@ -29,6 +35,14 @@ def homepage():
     global increase_hp
     global increase_hand_size
     global lifesteal
+    global hp
+    global hand_size
+    global ink_history
+    global ability_message
+    global player_word_history
+    global npc_word_history
+    global llm_response_history
+    global player_damage_history
     stage = 1
     word_number = 1
     current_level = 1
@@ -39,11 +53,15 @@ def homepage():
     increase_hp = False
     increase_hand_size = False
     lifesteal = False
-    return render_template('homepage.html')
+    hp = 10
+    hand_size = 10
+    ink_history = None
+    ability_message = None
+    player_word_history = None
+    npc_word_history = None
+    llm_response_history = None
+    player_damage_history = None
 
-
-@app.route("/initialize-game", methods=["POST"])
-def initialize_game():
     # draw the correct amount of letters for the player, add to list called hand
     global hand
     hand = draw_letters(hand_size)
