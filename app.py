@@ -819,6 +819,11 @@ def html_test():
     return render_template('html_test.html')
 
 
+@app.route("/tips-and-tricks", methods=["POST"])
+def tips_and_tricks():
+    return render_template('html_test.html')
+
+
 @app.route("/game-over", methods=["POST"])
 def game_over():
     return render_template('game_over.html')
