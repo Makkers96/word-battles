@@ -21,5 +21,5 @@ llm_chain = LLMChain(prompt=prompt,
 
 
 def get_winner(player_word, npc_word):
-    llm_answer = llm_chain.run(player_word=player_word, npc_word=npc_word)
+    llm_answer = llm_chain.predict(player_word=player_word, npc_word=npc_word)
     return llm_answer
