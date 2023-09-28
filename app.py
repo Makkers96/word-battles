@@ -1,21 +1,12 @@
-from flask import Flask, render_template, redirect, url_for, request
-from main import draw_letters, hand_size, pick_npc_word, lvl1_words, lvl2_words, lvl3_words, lvl4_words, lvl5_words, \
-    lvl6_words, lvl7_words, lvl8_words, lvl9_words, lvl10_words, special_characters, hp, sort_hand, generate_upgrades, \
-    alphabet, lifesteal_check, number_of_upgrades, list_of_upgrades
+from flask import Flask, render_template, redirect, url_for, request, session
+from main import draw_letters, hand_size, pick_npc_word, special_characters, sort_hand, generate_upgrades, \
+    alphabet, lifesteal_check, number_of_upgrades
 from llm import get_winner
+import os
 
 app = Flask(__name__)
 
-stage = 1
-word_number = 1
-current_level = 1
-ink = 0
-redraw = False
-summon_letter = False
-skip_word = False
-increase_hp = False
-increase_hand_size = False
-lifesteal = False
+app.secret_key = os.getenv('secret_key')
 
 @app.route("/")
 def homepage():
@@ -24,110 +15,99 @@ def homepage():
 
 @app.route("/initialize-game", methods=["POST"])
 def initialize_game():
-    # reset all of the game variables
-    global stage
-    global word_number
-    global current_level
-    global ink
-    global redraw
-    global summon_letter
-    global skip_word
-    global increase_hp
-    global increase_hand_size
-    global lifesteal
-    global hp
-    global hand_size
-    global ink_history
-    global ability_message
-    global player_word_history
-    global npc_word_history
-    global llm_response_history
-    global player_damage_history
-    global lvl1_words
-    global lvl2_words
-    global lvl3_words
-    global lvl4_words
-    global lvl5_words
-    global lvl6_words
-    global lvl7_words
-    global lvl8_words
-    global lvl9_words
-    global lvl10_words
-    stage = 1
-    word_number = 1
-    current_level = 1
-    ink = 0
-    redraw = False
-    summon_letter = False
-    skip_word = False
-    increase_hp = False
-    increase_hand_size = False
-    lifesteal = False
-    hp = 10
-    hand_size = 10
-    ink_history = None
-    ability_message = None
-    player_word_history = None
-    npc_word_history = None
-    llm_response_history = None
-    player_damage_history = None
-    lvl1_words = ['bat', 'book', 'rock', 'claws', 'scissors', 'cat', 'dog', 'wrestler', 'ice', 'melancholy',
-                  'psychology', 'keeper']
-    lvl2_words = ['robot', 'unicorn', 'mystery', 'bee', 'knife', 'fire', 'earth', 'light', 'thunder', 'science', 'elf',
-                  'mermaid']
-    lvl3_words = ['wizard', 'pirate', 'nina', 'samurai', 'vampire', 'werewolf', 'zombie', 'ghost', 'troll', 'witch',
-                  'knight', 'cyclops', 'yeti', 'minotaur']
-    lvl4_words = ['valkyrie', 'happy', 'believe', 'harmony', 'freedom', 'america', 'eagle', 'energy', 'imagination',
-                  'dream', 'truth', 'beauty']
-    lvl5_words = ['chaos', 'mystery', 'time', 'hope', 'knowledge', 'fate', 'courage', 'fear', 'justice', 'nightmare',
-                  'villian', 'sickness']
-    lvl6_words = ['mafia', 'magic', 'insane', 'maniac', 'murderer', 'faith', 'truth', 'beauty', 'joy', 'grace', 'hope',
-                  'harmony']
-    lvl7_words = ['indomitable', 'thunderbolt', 'explosion', 'earthquake', 'avalanche', 'justice', 'freedom', 'wisdom',
-                  'eternal', 'transcendent', 'pinnacle', 'valkyrie']
-    lvl8_words = ['goliath', 'hercules', 'colossus', 'juggernaut', 'warlord', 'inferno', 'behemoth', 'leviathan',
-                  'tsunami', 'kraken', 'gladiator']
-    lvl9_words = ['invincible', 'love', 'eternity', 'supreme', 'apex', 'wisdom', 'cataclysm', 'supernova', 'phoenix',
-                  'miracle', 'destiny', 'dominant']
-    lvl10_words = ['apocalypse', 'dragon', 'titan', 'warlord', 'omnipotence', 'omniscience', 'perfection', 'champion',
-                   'infinity', 'unbeatable', 'undefeated', 'death']
+    # reset all the game variables
+    session['stage'] = 1
+    session['word_number'] = 1
+    session['current_level'] = 1
+    session['ink'] = 0
+    session['redraw'] = False
+    session['summon_letter'] = False
+    session['skip_word'] = False
+    session['increase_hp'] = False
+    session['increase_hand_size'] = False
+    session['lifesteal'] = False
+    session['hp'] = 10
+    session['hand_size'] = 10
+    session['ink_history'] = None
+    session['ability_message'] = None
+    session['player_word_history'] = None
+    session['npc_word_history'] = None
+    session['llm_response_history'] = None
+    session['player_damage_history'] = None
+    session['lvl1_words'] = ['bat', 'book', 'rock', 'claws', 'scissors', 'cat', 'dog', 'wrestler', 'ice', 'melancholy',
+                             'psychology', 'keeper']
+    session['lvl2_words'] = ['robot', 'unicorn', 'mystery', 'bee', 'knife', 'fire', 'earth', 'light', 'thunder',
+                             'science', 'elf', 'mermaid']
+    session['lvl3_words'] = ['wizard', 'pirate', 'nina', 'samurai', 'vampire', 'werewolf', 'zombie', 'ghost', 'troll',
+                             'witch', 'knight', 'cyclops', 'yeti', 'minotaur']
+    session['lvl4_words'] = ['valkyrie', 'happy', 'believe', 'harmony', 'freedom', 'america', 'eagle', 'energy',
+                             'imagination', 'dream', 'truth', 'beauty']
+    session['lvl5_words'] = ['chaos', 'mystery', 'time', 'hope', 'knowledge', 'fate', 'courage', 'fear', 'justice',
+                             'nightmare', 'villian', 'sickness']
+    session['lvl6_words'] = ['mafia', 'magic', 'insane', 'maniac', 'murderer', 'faith', 'truth', 'beauty', 'joy',
+                             'grace', 'hope', 'harmony']
+    session['lvl7_words'] = ['indomitable', 'thunderbolt', 'explosion', 'earthquake', 'avalanche', 'justice', 'freedom',
+                             'wisdom', 'eternal', 'transcendent', 'pinnacle', 'valkyrie']
+    session['lvl8_words'] = ['goliath', 'hercules', 'colossus', 'juggernaut', 'warlord', 'inferno', 'behemoth',
+                             'leviathan', 'tsunami', 'kraken', 'gladiator']
+    session['lvl9_words'] = ['invincible', 'love', 'eternity', 'supreme', 'apex', 'wisdom', 'cataclysm', 'supernova',
+                             'phoenix', 'miracle', 'destiny', 'dominant']
+    session['lvl10_words'] = ['apocalypse', 'dragon', 'titan', 'warlord', 'omnipotence', 'omniscience', 'perfection',
+                              'champion', 'infinity', 'unbeatable', 'undefeated', 'death']
+    session['list_of_upgrades'] = [{'upgrade': 'redraw', 'description': 'Redraw your hand. Cost: 10 Ink'},
+                     {'upgrade': 'summon_letter', 'description': 'Add any 1 letter to your hand. Cost: 15 Ink'},
+                     {'upgrade': 'skip_word', 'description': 'Skip the word. Cost: 20 Ink'},
+                     {'upgrade': 'increase_hp', 'description': 'Increase your hp by 1. Cost: 30 Ink'},
+                     {'upgrade': 'increase_hand_size', 'description': 'Increase your hand size by 1. Cost: 50 Ink'},
+                     {'upgrade': 'lifesteal', 'description': '10% chance to heal 1 HP if beat word. Cost: Passive'}
+                     ]
 
     # draw the correct amount of letters for the player, add to list called hand
-    global hand
-    hand = draw_letters(hand_size)
-    hand = sort_hand(hand)
+    session['hand'] = draw_letters(hand_size)
+    session['hand'] = sort_hand(session['hand'])
+
     # pick a random npc word, remove that word from lvl1 deck, add to lvl1 played words list
-    global npc_word
-    npc_word = pick_npc_word(lvl1_words)
-    lvl1_words.remove(npc_word)
+    session['npc_word'] = pick_npc_word(session['lvl1_words'])
+    session['lvl1_words'].remove(session['npc_word'])
+
     return redirect(url_for("game"))
 
 
 @app.route("/game", methods=["GET", "POST"])
 def game():
     print(f"/game something was sent in request.form: {request.form}")
-    global npc_word
-    global hand
-    global hand_size
-    global hp
-    global stage
-    global player_word_history
-    global npc_word_history
-    global llm_response_history
-    global player_damage_history
-    global current_level
-    global ink
-    global chosen_rewards
-    global redraw
-    global summon_letter
-    global skip_word
-    global increase_hp
-    global increase_hand_size
-    global lifesteal
-    global ability_message
-    global ink_history
-    global word_number
 
+    stage = session['stage']
+    word_number = session['word_number']
+    current_level = session['current_level']
+    ink = session['ink']
+    redraw = session['redraw']
+    summon_letter = session['summon_letter']
+    skip_word = session['skip_word']
+    increase_hp = session['increase_hp']
+    increase_hand_size = session['increase_hand_size']
+    lifesteal = session['lifesteal']
+    hp = session['hp']
+    hand_size = session['hand_size']
+    ink_history = session['ink_history']
+    ability_message = session['ability_message']
+    player_word_history = session['player_word_history']
+    npc_word_history = session['npc_word_history']
+    llm_response_history = session['llm_response_history']
+    player_damage_history = session['player_damage_history']
+    lvl1_words = session['lvl1_words']
+    lvl2_words = session['lvl2_words']
+    lvl3_words = session['lvl3_words']
+    lvl4_words = session['lvl4_words']
+    lvl5_words = session['lvl5_words']
+    lvl6_words = session['lvl6_words']
+    lvl7_words = session['lvl7_words']
+    lvl8_words = session['lvl8_words']
+    lvl9_words = session['lvl9_words']
+    lvl10_words = session['lvl10_words']
+    hand = session['hand']
+    npc_word = session['npc_word']
+    list_of_upgrades = session['list_of_upgrades']
 
     lvl1_base_ink = 2
     lvl1_ink_reward = int(lvl1_base_ink + 0.1 * ink)
@@ -161,8 +141,10 @@ def game():
     if request.method == "POST":
         if "player_word" in request.form:
 
-            player_damage_history = None
-            ability_message = None
+            session['player_damage_history'] = None
+            player_damage_history = session['player_damage_history']
+            session['ability_message'] = None
+            ability_message = session['ability_message']
 
             # capture the details about entered word
             player_word = request.form.get('player_word').lower()
@@ -342,7 +324,8 @@ def game():
                 rewards_descriptions = []
 
                 # pulling X amount of random upgrades from the list of upgrades
-                chosen_rewards = generate_upgrades(number_of_upgrades_shown)
+                session['chosen_rewards'] = generate_upgrades(number_of_upgrades_shown)
+                chosen_rewards = session['chosen_rewards']
 
                 # adding the descriptions of the chosen_rewards to the rewards_descriptions list
                 for i, reward_description in enumerate(range(number_of_upgrades_shown)):
@@ -424,6 +407,8 @@ def game():
 
     if request.method == "POST":
         if "reward_choice" in request.form:
+
+            chosen_rewards = session['chosen_rewards']
 
             # add reward chosen
             chosen_reward_form = request.form.get('reward')
